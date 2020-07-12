@@ -3,7 +3,13 @@
 {% block body %}
     <div id="cheese-app">
         <cheese-whiz-app
-            entrypoint="{{ path('api_entrypoint') }}"
+                entrypoint="{{ path('api_entrypoint') }}"
         ></cheese-whiz-app>
     </div>
+
+
+    <script>
+        window.user = {{ user|raw }};
+    </script>
+
 {% endblock %}

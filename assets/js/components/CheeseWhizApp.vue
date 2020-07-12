@@ -20,19 +20,22 @@
                         <span v-else>not authenticated</span>
                     </p>
                     <p class="text-white">
-                        Check out the API Docs: <a v-bind:href="entrypoint" class="text-white"><u>{{ entrypoint }}</u></a>
+                        Check out the API Docs: <a v-bind:href="entrypoint" class="text-white"><u>{{ entrypoint
+                        }}</u></a>
                     </p>
                 </div>
                 <div class="col-xs-12 col-md-6 px-5" style="background-color: #7FB7D7; padding-bottom: 150px;">
                     <h2 class="text-center mb-5 pt-5 text-white">Or, login!</h2>
                     <loginForm
-                        v-on:user-authenticated="onUserAuthenticated"
+                            v-on:user-authenticated="onUserAuthenticated"
                     ></loginForm>
                 </div>
             </div>
             <footer class="footer">
 
-                    <p class="text-muted my-5 text-center">Made with ❤️ by the <a style="text-decoration: underline; color: #6c757d; font-weight: bold;" href="http://www.symfonycasts.com">SymfonyCasts</a> Team</p>
+                <p class="text-muted my-5 text-center">Made with ❤️ by the <a
+                        style="text-decoration: underline; color: #6c757d; font-weight: bold;"
+                        href="http://www.symfonycasts.com">SymfonyCasts</a> Team</p>
 
             </footer>
         </div>
@@ -47,17 +50,22 @@
         components: {
             loginForm
         },
-        props: ['entrypoint'],
+        props: [ 'entrypoint' ],
         methods: {
             onUserAuthenticated(userUri) {
                 axios
                     .get(userUri)
-                    .then(response => (this.user = response.data))
+                    .then(response => ( this.user = response.data ))
             }
         },
         data() {
             return {
                 user: null
+            }
+        },
+        mounted() {
+            if (window.user) {
+                this.user = window.user;
             }
         }
     }
