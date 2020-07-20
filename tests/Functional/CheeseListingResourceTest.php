@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Test\Functional;
+namespace App\tests\Functional;
 
 use App\Entity\CheeseListing;
 use App\Test\CustomApitestCase;

@@ -16,15 +16,17 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ApiResource(
- *     security="is_granted('ROLE_USER')",
  *     itemOperations={
- *      "get"={"security"="is_granted('ROLE_USER')"},
+ *      "get",
  *      "put"={"security"="is_granted('ROLE_USER') and object == user"},
  *      "delete"={"security"="is_granted('ROLE_ADMIN')"}
  *     },
  *     collectionOperations={
- *      "get"={"security"="is_granted('ROLE_USER')"},
- *      "post"={"security"="is_granted('IS_AUTHENTICATED_ANONYMOUSLY')"},
+ *      "get",
+ *      "post"={
+ *          "security"="is_granted('IS_AUTHENTICATED_ANONYMOUSLY')",
+ *          "validation_groups"={"Default", "create"}
+ *      },
  *     },
  *     normalizationContext={"groups"={"user:read"}},
  *     denormalizationContext={"groups"={"user:write"}},
@@ -53,6 +55,7 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="json")
+     * @Groups({"admin:write"})
      */
     private $roles = [];
 
@@ -65,6 +68,7 @@ class User implements UserInterface
     /**
      * @Groups({"user:write"})
      * @SerializedName("password")
+     * @Assert\NotBlank(groups={"create"})
      */
     private $plainPassword;
 
@@ -81,6 +85,12 @@ class User implements UserInterface
      * @Assert\Valid()
      */
     private $cheeseListings;
+
+    /**
+     * @ORM\Column(type="string", length=50, nullable=true)
+     * @Groups({"admin:read", "user:write"})
+     */
+    private $phoneNumber;
 
     public function __construct()
     {
@@ -218,6 +228,18 @@ class User implements UserInterface
     public function setPlainPassword($plainPassword): self
     {
         $this->plainPassword = $plainPassword;
+
+        return $this;
+    }
+
+    public function getPhoneNumber(): ?string
+    {
+        return $this->phoneNumber;
+    }
+
+    public function setPhoneNumber(?string $phoneNumber): self
+    {
+        $this->phoneNumber = $phoneNumber;
 
         return $this;
     }
