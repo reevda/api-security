@@ -21,12 +21,14 @@ final class AdminGroupsContextBuilder implements SerializerContextBuilderInterfa
     {
         $context = $this->decorated->createFromRequest($request, $normalization, $extractedAttributes);
 
-        $isAdmin = $this->authorizationChecker->isGranted('ROLE_ADMIN');
+        $context['groups'] = $context['groups'] ?? [];
 
-        if ($context['groups'] && $isAdmin) {
+        $isAdmin = $this->authorizationChecker->isGranted('ROLE_ADMIN');
+        if ($isAdmin) {
             $context['groups'][] = $normalization ? 'admin:read' : 'admin:write';
         }
-
+        $context['groups'] = array_unique($context['groups']);
         return $context;
     }
+
 }

@@ -4,7 +4,7 @@
 namespace App\tests\Functional;
 
 use App\Entity\User;
-use App\Test\CustomApitestCase;
+use App\ApiPlatform\Test\CustomApitestCase;
 use Hautelook\AliceBundle\PhpUnit\ReloadDatabaseTrait;
 
 class UserResourceTest extends CustomApitestCase
@@ -51,7 +51,8 @@ class UserResourceTest extends CustomApitestCase
     public function testGetUser()
     {
         $client = self::createClient();
-        $user = $this->createUserAndLogin($client, 'cheeseplease@example.com', 'foo');
+        $user = $this->createUser('cheeseplease@example.com', 'foo');
+        $this->createUserAndLogin($client, 'authenticate@example.com', 'foo');
 
         $user->setPhoneNumber('555.123.4567');
         $em = $this->getEntityManager();

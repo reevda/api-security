@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Test;
+namespace App\ApiPlatform\Test;
 
 use ApiPlatform\Core\Bridge\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\Test\Client;

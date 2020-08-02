@@ -3,7 +3,7 @@
 namespace App\tests\Functional;
 
 use App\Entity\CheeseListing;
-use App\Test\CustomApitestCase;
+use App\ApiPlatform\Test\CustomApitestCase;
 use Hautelook\AliceBundle\PhpUnit\ReloadDatabaseTrait;
 
 class CheeseListingResourceTest extends CustomApitestCase
@@ -21,7 +21,8 @@ class CheeseListingResourceTest extends CustomApitestCase
         $this->assertResponseStatusCodeSame(401);
 
         /** Création et login de l'utilisateur */
-        $user = $this->createUserAndLogin($client, 'cheeseplease@example.com', 'foo');
+        $authenticatedUser = $this->createUserAndLogin($client, 'cheeseplease@example.com', 'foo');
+        $otherUser = $this->createUser('otheruser@example.com', 'foo');
 
         /** Authentification OK, pas de données passées => 400  */
         $client->request('POST', '/api/cheeses', [
@@ -29,17 +30,22 @@ class CheeseListingResourceTest extends CustomApitestCase
         ]);
         $this->assertResponseStatusCodeSame(400);
 
-        /** Authentification OK, saisie d'une entrée => 201  */
+        $cheesyData = [
+            'title' => 'Mystery cheese... kinda green',
+            'description' => 'What mysteries does it hold?',
+            'price' => 5000
+        ];
+
         $client->request('POST', '/api/cheeses', [
-            'json' => [
-                'title'=>'My new cheese',
-                'description'=>'My new cheese description',
-                'price'=>1000,
-                'isPublished'=>true,
-                'owner'=>'/api/users/'.$user->getId()
-            ]
+            'json' => $cheesyData + ['owner'=>'/api/users/'.$otherUser->getId()]
+        ]);
+        $this->assertResponseStatusCodeSame(400, 'not passing the correct owner');
+
+        $client->request('POST', '/api/cheeses', [
+            'json' => $cheesyData + ['owner'=>'/api/users/'.$authenticatedUser->getId()]
         ]);
         $this->assertResponseStatusCodeSame(201);
+
     }
 
     public function testUpdateCheeseListing()
@@ -57,15 +63,15 @@ class CheeseListingResourceTest extends CustomApitestCase
         $em->flush();
 
         $this->login($client, 'user2@example.com', 'foo');
-        $client->request('PUT', '/api/cheeses/'.$cheeseListing->getId(),[
-            'json' => ['title' => 'updated', 'description'=>'nnnnh']
+        $client->request('PUT', '/api/cheeses/' . $cheeseListing->getId(), [
+            'json' => ['title' => 'updated', 'description' => 'nnnnh']
         ]);
         $this->assertResponseStatusCodeSame(403);
 //        var_dump($client->getResponse()->getContent(false));
 
         $this->login($client, 'user1@example.com', 'foo');
-        $client->request('PUT', '/api/cheeses/'.$cheeseListing->getId(),[
-            'json' => ['title' => 'updated', 'description'=>'nnnnh']
+        $client->request('PUT', '/api/cheeses/' . $cheeseListing->getId(), [
+            'json' => ['title' => 'updated', 'description' => 'nnnnh']
         ]);
         $this->assertResponseStatusCodeSame(200);
     }
