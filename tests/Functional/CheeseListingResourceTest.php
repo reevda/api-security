@@ -24,17 +24,18 @@ class CheeseListingResourceTest extends CustomApitestCase
         $authenticatedUser = $this->createUserAndLogin($client, 'cheeseplease@example.com', 'foo');
         $otherUser = $this->createUser('otheruser@example.com', 'foo');
 
-        /** Authentification OK, pas de données passées => 400  */
-        $client->request('POST', '/api/cheeses', [
-            'json' => []
-        ]);
-        $this->assertResponseStatusCodeSame(400);
 
         $cheesyData = [
             'title' => 'Mystery cheese... kinda green',
             'description' => 'What mysteries does it hold?',
             'price' => 5000
         ];
+
+        $client->request('POST', '/api/cheeses', [
+            'json' => $cheesyData
+        ]);
+        $this->assertResponseStatusCodeSame(201);
+
 
         $client->request('POST', '/api/cheeses', [
             'json' => $cheesyData + ['owner'=>'/api/users/'.$otherUser->getId()]
