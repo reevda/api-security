@@ -81,7 +81,7 @@ class User implements UserInterface
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\CheeseListing", mappedBy="owner", cascade={"persist"}, orphanRemoval=true)
-     * @Groups({"user:read", "user:write"})
+     * @Groups({"user:write"})
      * @Assert\Valid()
      */
     private $cheeseListings;
@@ -121,7 +121,14 @@ class User implements UserInterface
      */
     public function getUsername(): string
     {
-        return (string) $this->username;
+        return (string)$this->username;
+    }
+
+    public function setUsername(string $username): self
+    {
+        $this->username = $username;
+
+        return $this;
     }
 
     /**
@@ -148,7 +155,7 @@ class User implements UserInterface
      */
     public function getPassword(): string
     {
-        return (string) $this->password;
+        return (string)$this->password;
     }
 
     public function setPassword(string $password): self
@@ -172,14 +179,7 @@ class User implements UserInterface
     public function eraseCredentials()
     {
         // If you store any temporary, sensitive data on the user, clear it here
-         $this->plainPassword = null;
-    }
-
-    public function setUsername(string $username): self
-    {
-        $this->username = $username;
-
-        return $this;
+        $this->plainPassword = null;
     }
 
     /**
@@ -188,6 +188,18 @@ class User implements UserInterface
     public function getCheeseListings(): Collection
     {
         return $this->cheeseListings;
+    }
+
+    /**
+     * @return Collection|CheeseListing[]
+     * @Groups({"user:read"})
+     * @SerializedName("cheeseListings")
+     */
+    public function getPublishedCheeseListings(): Collection
+    {
+        return $this->cheeseListings->filter(function (CheeseListing $cheeseListing) {
+            return $cheeseListing->getIsPublished();
+        });
     }
 
     public function addCheeseListing(CheeseListing $cheeseListing): self
